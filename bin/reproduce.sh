@@ -6,6 +6,12 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+# Real, host-level env vars, forwarded into the app container via docker-compose.yml's
+# environment section. Neither is declared in phpunit.dist.xml; DRINK also isn't in .env, but
+# SEASON is (with a different value). See DotenvVarsTest for why that distinction matters.
+export DRINK=coffee
+export SEASON=summer
+
 cleanup() {
     docker compose down --remove-orphans >/dev/null 2>&1 || true
 }
@@ -18,4 +24,7 @@ docker compose run --rm -T app composer update --no-interaction --quiet >/dev/nu
 echo
 echo "Running the reproducer - one test passes, one is expected to FAIL (that failure is the bug):"
 echo
-docker compose run --quiet --rm app vendor/bin/phpunit || :
+# Docker/Podman Compose's own banner and container-lifecycle chatter go to stderr, while the
+# containerized command's real output (phpunit's) goes to stdout - so this hides the former
+# without touching the latter.
+docker compose run --rm app vendor/bin/phpunit 2>/dev/null

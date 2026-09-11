@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/animal', name: 'animal')]
 class AnimalController
 {
     public function __construct(

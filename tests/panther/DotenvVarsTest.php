@@ -16,11 +16,12 @@ use Symfony\Component\Panther\PantherTestCase;
  *
  * Each test below overrides one env var via Panther's 'env' option and asserts the override took
  * effect. COLOR gets two tests - one without resetting SYMFONY_DOTENV_VARS (fails: the bug) and
- * one that also resets it (passes: the documented workaround) - while ANIMAL and FOOD each get
- * one, since for them the override always works regardless of the reset (see each test's own doc
- * comment for why). Wherever a var also has a known default from .env and/or phpunit.dist.xml,
- * the test asserts upfront that the response isn't that default, before asserting it's the
- * override - so a failure clearly shows which default leaked through instead.
+ * one that also resets it (passes: the documented workaround) - while ANIMAL, FOOD, DRINK and
+ * SEASON each get one, since for them the override always works regardless of the reset (see
+ * each test's own doc comment for why). Wherever a var also has a known default - from .env,
+ * phpunit.dist.xml, or a real env var set in bin/reproduce.sh - the test asserts upfront that the
+ * response isn't that default, before asserting it's the override - so a failure clearly shows
+ * which default leaked through instead.
  */
 final class DotenvVarsTest extends PantherTestCase
 {
@@ -122,11 +123,72 @@ final class DotenvVarsTest extends PantherTestCase
     }
 
     /**
+     * DRINK is never declared in .env or phpunit.dist.xml - it only exists as a real env var
+     * exported by bin/reproduce.sh, forwarded into the container by docker-compose.yml. Dotenv
+     * never considers it at all, for the same reason as FOOD: it's not a key in any file Dotenv
+     * parses. The override should always take effect.
+     *
+     * Only running this test via `composer run reproduce` (or docker-compose.yml's forwarding)
+     * sets DRINK at all - export DRINK yourself first if you run phpunit some other way.
+     */
+    public function testDrinkOverrideWorks(): void
+    {
+        $client = self::createClientWithEnv(['DRINK' => 'juice']);
+        $client->request('GET', '/drink');
+        $actualDrink = $client->findElement(WebDriverBy::xpath('html'))->getText();
+
+        self::assertNotSame(
+            'coffee', // the value bin/reproduce.sh exports
+            $actualDrink,
+            'The controller returned the default value ("coffee") instead of the overridden one.',
+        );
+        self::assertSame(
+            'juice',
+            $actualDrink,
+            'The controller did not return the overridden DRINK value - the override was ignored.',
+        );
+    }
+
+    /**
+     * SEASON is declared in .env AND exported as a real env var by bin/reproduce.sh, forwarded
+     * into the container by docker-compose.yml. That real env var is already set before
+     * tests/bootstrap.php's Dotenv::bootEnv() call ever sees .env, so - just like ANIMAL, only via
+     * a real env var instead of phpunit.dist.xml - Dotenv finds it already set and never tracks
+     * it in SYMFONY_DOTENV_VARS. The override should always take effect.
+     *
+     * Only running this test via `composer run reproduce` (or docker-compose.yml's forwarding)
+     * sets that real env var at all - export SEASON yourself first if you run phpunit some other
+     * way, or this test reproduces the bug instead (like COLOR).
+     */
+    public function testSeasonOverrideWorks(): void
+    {
+        $client = self::createClientWithEnv(['SEASON' => 'autumn']);
+        $client->request('GET', '/season');
+        $actualSeason = $client->findElement(WebDriverBy::xpath('html'))->getText();
+
+        self::assertNotSame(
+            'winter', // the value declared in .env
+            $actualSeason,
+            'The controller returned .env\'s default value ("winter") instead of the overridden one.',
+        );
+        self::assertNotSame(
+            'summer', // the value bin/reproduce.sh exports
+            $actualSeason,
+            'The controller returned the default value ("summer") instead of the overridden one.',
+        );
+        self::assertSame(
+            'autumn',
+            $actualSeason,
+            'The controller did not return the overridden SEASON value - the override was ignored.',
+        );
+    }
+
+    /**
      * Starts the Panther-managed web server with exactly the given env vars.
      *
      * Panther's ServerExtension (bootstrapped in phpunit.dist.xml) keeps a single web
      * server/client alive for the whole suite for speed.
-     * Forcing a restart per call keeps the three tests isolated from each other.
+     * Forcing a restart per call keeps the tests isolated from each other.
      */
     private static function createClientWithEnv(array $env): PantherClient
     {

@@ -2,9 +2,6 @@
 
 namespace App;
 
-use App\Controller\AnimalController;
-use App\Controller\ColorController;
-use App\Controller\FoodController;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -26,31 +23,17 @@ class Kernel extends BaseKernel
             'secret' => '%env(APP_SECRET)%',
         ]);
 
-        $container->services()
-            ->set(ColorController::class)
+        $services = $container->services();
+        $services->defaults()
             ->autowire()
-            ->public();
+            ->autoconfigure();
 
-        $container->services()
-            ->set(AnimalController::class)
-            ->autowire()
-            ->public();
-
-        $container->services()
-            ->set(FoodController::class)
-            ->autowire()
-            ->public();
+        $services->load('App\\Controller\\', __DIR__.'/Controller/')
+            ->tag('controller.service_arguments');
     }
 
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
-        $routes->add('color', '/color')
-            ->controller(ColorController::class);
-
-        $routes->add('animal', '/animal')
-            ->controller(AnimalController::class);
-
-        $routes->add('food', '/food')
-            ->controller(FoodController::class);
+        $routes->import(__DIR__.'/Controller/', 'attribute');
     }
 }
