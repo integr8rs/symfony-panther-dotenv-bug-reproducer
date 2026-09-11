@@ -14,6 +14,15 @@
     <env name="APP_SECRET" value="changeme"/>
     <server name="APP_ENV" value="test" force="true"/>
     <server name="SHELL_VERBOSITY" value="-1"/>
+    <!-- ANIMAL is also declared in .env (see DotenvVarsTest) - this <env> element runs before
+         tests/bootstrap.php's Dotenv::bootEnv() call, so by the time Dotenv looks at .env, ANIMAL
+         is already set and gets skipped rather than tracked in SYMFONY_DOTENV_VARS. Note it must
+         be an <env>, not a <server>, element - only <env> calls putenv(), which is what makes the
+         value real process env, inherited by the Panther-managed web server's child process. -->
+    <env name="ANIMAL" value="cat"/>
+    <!-- FOOD is never declared in .env at all (see DotenvVarsTest) - Dotenv doesn't even consider
+         it, let alone track it in SYMFONY_DOTENV_VARS. -->
+    <env name="FOOD" value="pizza"/>
   </php>
   <testsuites>
     <testsuite name="Panther">

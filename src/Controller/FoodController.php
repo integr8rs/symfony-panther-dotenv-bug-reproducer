@@ -5,16 +5,16 @@ namespace App\Controller;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 
-class FavoriteColorController
+class FoodController
 {
     public function __construct(
-        #[Autowire(env: 'FAVORITE_COLOR')]
-        private readonly string $favoriteColor,
+        #[Autowire(env: 'FOOD')]
+        private readonly string $food,
     ) {
     }
 
     public function __invoke(): Response
     {
-        return new Response($this->favoriteColor, 200, ['Content-Type' => 'text/plain']);
+        return new Response($this->food, 200, ['Content-Type' => 'text/plain']);
     }
 }

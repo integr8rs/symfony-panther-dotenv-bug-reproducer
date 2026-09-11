@@ -2,7 +2,9 @@
 
 namespace App;
 
-use App\Controller\FavoriteColorController;
+use App\Controller\AnimalController;
+use App\Controller\ColorController;
+use App\Controller\FoodController;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -25,14 +27,30 @@ class Kernel extends BaseKernel
         ]);
 
         $container->services()
-            ->set(FavoriteColorController::class)
+            ->set(ColorController::class)
+            ->autowire()
+            ->public();
+
+        $container->services()
+            ->set(AnimalController::class)
+            ->autowire()
+            ->public();
+
+        $container->services()
+            ->set(FoodController::class)
             ->autowire()
             ->public();
     }
 
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
-        $routes->add('favorite_color', '/favorite-color')
-            ->controller(FavoriteColorController::class);
+        $routes->add('color', '/color')
+            ->controller(ColorController::class);
+
+        $routes->add('animal', '/animal')
+            ->controller(AnimalController::class);
+
+        $routes->add('food', '/food')
+            ->controller(FoodController::class);
     }
 }
