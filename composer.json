@@ -4,6 +4,7 @@
     "require": {
         "php": ">=8.3",
         "symfony/dotenv": "7.4.*",
+        "symfony/flex": "^2.11",
         "symfony/framework-bundle": "7.4.*",
         "symfony/runtime": "7.4.*",
         "symfony/string": "7.4.*"
@@ -14,6 +15,7 @@
     },
     "config": {
         "allow-plugins": {
+            "symfony/flex": true,
             "symfony/runtime": true
         },
         "sort-packages": true
@@ -31,10 +33,18 @@
     "extra": {
         "runtime": {
             "class": "Symfony\\Component\\Runtime\\SymfonyRuntime"
+        },
+        "symfony": {
+            "allow-contrib": false,
+            "require": "7.4.*"
         }
     },
     "scripts": {
-        "reproduce": "bash bin/reproduce.sh"
+        "reproduce": "bash bin/reproduce.sh",
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        }
     },
     "scripts-descriptions": {
         "reproduce": "Builds a throwaway Docker container and runs the SYMFONY_DOTENV_VARS bug-reproduction tests, cleaning up afterward."
