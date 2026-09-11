@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TestSuite\Panther;
+namespace TestSuite;
 
 use Facebook\WebDriver\WebDriverBy;
 use Symfony\Component\Panther\Client as PantherClient;
