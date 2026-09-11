@@ -1,0 +1,16 @@
+services:
+  app:
+    build:
+      context: .
+    working_dir: /app
+    volumes:
+      - .:/app
+    shm_size: 2gb # Chrome needs more than Docker's default 64MB /dev/shm
+    environment:
+      # Chrome refuses to run its sandbox as root (the default user in this image), and
+      # chromedriver needs to be told where Debian installs the chromium binary.
+      PANTHER_NO_SANDBOX: "1"
+      PANTHER_CHROME_BINARY: "/usr/bin/chromium"
+    # ';' rather than '&&': keep the container (and thus `docker compose exec`) alive even if
+    # composer install fails, so its output stays inspectable via `docker compose logs app`.
+    command: sh -c "composer install --no-interaction; tail -f /dev/null"

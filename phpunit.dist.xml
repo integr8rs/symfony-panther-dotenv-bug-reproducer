@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- https://docs.phpunit.de/en/12.0/configuration.html -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         backupGlobals="false"
+         colors="true"
+         bootstrap="tests/bootstrap.php"
+         cacheDirectory="./var/cache/test"
+>
+  <php>
+    <ini name="display_errors" value="1"/>
+    <ini name="error_reporting" value="-1"/>
+    <env name="KERNEL_CLASS" value="App\Kernel"/>
+    <env name="APP_SECRET" value="changeme"/>
+    <server name="APP_ENV" value="test" force="true"/>
+    <server name="SHELL_VERBOSITY" value="-1"/>
+  </php>
+  <testsuites>
+    <testsuite name="Panther">
+      <directory>tests/panther/</directory>
+    </testsuite>
+  </testsuites>
+  <extensions>
+    <bootstrap class="Symfony\Component\Panther\ServerExtension"/>
+  </extensions>
+</phpunit>

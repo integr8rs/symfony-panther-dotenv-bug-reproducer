@@ -1,0 +1,6 @@
+.env.local
+.env.*.local
+composer.lock
+ISSUE.md
+/var/
+/vendor/
