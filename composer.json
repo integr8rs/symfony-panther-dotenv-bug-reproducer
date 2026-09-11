@@ -32,5 +32,11 @@
         "runtime": {
             "class": "Symfony\\Component\\Runtime\\SymfonyRuntime"
         }
+    },
+    "scripts": {
+        "reproduce": "bash bin/reproduce.sh"
+    },
+    "scripts-descriptions": {
+        "reproduce": "Builds a throwaway Docker container and runs the SYMFONY_DOTENV_VARS bug-reproduction tests, cleaning up afterward."
     }
 }
