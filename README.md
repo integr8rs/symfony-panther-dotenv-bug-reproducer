@@ -1,6 +1,6 @@
 # Symfony Dotenv/Panther reproducer
 
-Reproducer project for a bug reported on the GitHub issue tracker (link: TODO).
+Reproducer project for [a bug reported on the GitHub issue tracker](https://github.com/symfony/symfony/issues/66019).
 
 ## Branches
 
